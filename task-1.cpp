@@ -1,74 +1,57 @@
-#include <iostream>   // Стандартная библиотека для ввода/вывода
-#include <cstdlib>    // Для функций rand() и srand()
-#include <ctime>      // Для функции time() (используется как seed для генератора случайных чисел)
-using namespace std;
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+const int SIZE = 5;
+
+void fillArray(int (*arr)[SIZE]) {
+    srand(time(0));
+    for (int *ptr = &arr[0][0]; ptr <= &arr[SIZE - 1][SIZE - 1]; ptr++) {
+        *ptr = rand() % 100;  // Заповнення випадковими числами від 0 до 99
+    }
+}
+
+void printArray(int (*arr)[SIZE]) {
+    for (int *ptr = &arr[0][0]; ptr <= &arr[SIZE - 1][SIZE - 1]; ptr++) {
+        std::cout << *ptr << "\t";
+        if ((ptr - &arr[0][0] + 1) % SIZE == 0)
+            std::cout << std::endl;
+    }
+}
+
+void printDiagonals(int (*arr)[SIZE]) {
+    std::cout << "Головна діагональ: ";
+    for (int i = 0; i < SIZE; i++) {
+        std::cout << *(*(arr + i) + i) << " ";
+    }
+    std::cout << "\nПобічна діагональ: ";
+    for (int i = 0; i < SIZE; i++) {
+        std::cout << *(*(arr + i) + (SIZE - 1 - i)) << " ";
+    }
+    std::cout << std::endl;
+}
+
+void countEvenOdd(int (*arr)[SIZE], int &evenCount, int &oddCount) {
+    evenCount = oddCount = 0;
+    for (int *ptr = &arr[0][0]; ptr <= &arr[SIZE - 1][SIZE - 1]; ptr++) {
+        (*ptr % 2 == 0) ? evenCount++ : oddCount++;
+    }
+}
 
 int main() {
-    // --- Определяем размеры матрицы ---
-    const int ROWS = 5;  // Количество строк
-    const int COLS = 5;  // Количество столбцов
+    int arr[SIZE][SIZE];
 
-    // --- Динамическое выделение памяти для двумерного массива ---
-    // Выделяем память для массива указателей на строки
-    int** matrix = new int*[ROWS];
-    // Для каждой строки выделяем память для массива столбцов
-    for (int i = 0; i < ROWS; i++) {
-        matrix[i] = new int[COLS];
-    }
+    fillArray(arr);
+    std::cout << "Масив:\n";
+    printArray(arr);
 
-    // --- Инициализация генератора случайных чисел ---
-    srand(time(NULL));
+    printDiagonals(arr);
 
-    // --- Заполнение матрицы случайными числами (от 0 до 99) ---
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLS; j++) {
-            matrix[i][j] = rand() % 100;
-        }
-    }
-
-    // --- Вывод сгенерированной матрицы ---
-    cout << "Generated matrix:" << endl;
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLS; j++) {
-            cout << matrix[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    // --- Вывод элементов главной диагонали ---
-    cout << "\nElements of MAIN diagonal:" << endl;
-    // Главная диагональ: элементы, у которых индекс строки равен индексу столбца
-    for (int i = 0; i < ROWS && i < COLS; i++) {
-        cout << matrix[i][i] << " ";
-    }
-    cout << "\n\n";
-
-    // --- Вывод элементов побочной (другой) диагонали ---
-    cout << "Elements of OTHER diagonal:" << endl;
-    // Побочная диагональ: элемент в строке i имеет индекс столбца (COLS - 1 - i)
-    for (int i = 0; i < ROWS && i < COLS; i++) {
-        cout << matrix[i][COLS - 1 - i] << " ";
-    }
-    cout << "\n\n";
-
-    // --- Подсчёт количества чётных и нечётных чисел ---
-    int evenCount = 0, oddCount = 0;
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLS; j++) {
-            if (matrix[i][j] % 2 == 0)
-                evenCount++;
-            else
-                oddCount++;
-        }
-    }
-    cout << "Amount of even nums: " << evenCount << endl;
-    cout << "Amount of odd nums: " << oddCount << endl;
-
-    // --- Освобождение динамически выделенной памяти ---
-    for (int i = 0; i < ROWS; i++) {
-        delete[] matrix[i]; // Освобождаем память для каждой строки
-    }
-    delete[] matrix; // Освобождаем память для массива указателей
+    int evenCount, oddCount;
+    countEvenOdd(arr, evenCount, oddCount);
+    
+    std::cout << "Кількість парних елементів: " << evenCount << std::endl;
+    std::cout << "Кількість непарних елементів: " << oddCount << std::endl;
 
     return 0;
 }
